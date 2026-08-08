@@ -1,0 +1,313 @@
+"use client";
+
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { AccountRow, CategoryRow, TransactionRow } from "@/lib/types";
+import { centsToDollarsString, dollarsStringToCents } from "@/lib/money";
+
+export default function TransactionsTable() {
+  const [transactions, setTransactions] = useState<TransactionRow[]>([]);
+  const [accounts, setAccounts] = useState<AccountRow[]>([]);
+  const [categories, setCategories] = useState<CategoryRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [accountFilter, setAccountFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [q, setQ] = useState("");
+
+  const load = useCallback(async () => {
+    try {
+      const params = new URLSearchParams();
+      if (accountFilter) params.set("accountId", accountFilter);
+      if (categoryFilter) params.set("categoryId", categoryFilter);
+      if (dateFrom) params.set("dateFrom", dateFrom);
+      if (dateTo) params.set("dateTo", dateTo);
+      if (q) params.set("q", q);
+
+      const [txRes, acctRes, catRes] = await Promise.all([
+        fetch(`/api/transactions?${params.toString()}`),
+        accounts.length ? Promise.resolve(null) : fetch("/api/accounts"),
+        categories.length ? Promise.resolve(null) : fetch("/api/categories"),
+      ]);
+      setTransactions(await txRes.json());
+      if (acctRes) setAccounts(await acctRes.json());
+      if (catRes) setCategories(await catRes.json());
+      setError(null);
+    } catch {
+      setError("Failed to load transactions.");
+    } finally {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountFilter, categoryFilter, dateFrom, dateTo, q]);
+
+  useEffect(() => {
+    // load() only sets state after its internal awaits resolve; it's reused
+    // across filter changes so isn't inlined here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    load();
+  }, [load]);
+
+  async function updateTransaction(id: number, updates: Record<string, unknown>) {
+    setError(null);
+    try {
+      const res = await fetch(`/api/transactions/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error ?? "Failed to update.");
+      }
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to update transaction.");
+    }
+  }
+
+  async function deleteTransaction(id: number) {
+    if (!confirm("Delete this transaction?")) return;
+    await fetch(`/api/transactions/${id}`, { method: "DELETE" });
+    setTransactions((prev) => prev.filter((t) => t.id !== id));
+  }
+
+  const total = useMemo(
+    () => transactions.reduce((sum, t) => sum + t.amountCents, 0),
+    [transactions],
+  );
+
+  return (
+    <div>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-lg font-semibold">Transactions</h1>
+        <Link
+          href="/transactions/new"
+          className="rounded-md bg-slate-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-slate-700"
+        >
+          + New transaction
+        </Link>
+      </div>
+
+      <div className="mb-4 flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4">
+        <FilterField label="Account">
+          <select
+            value={accountFilter}
+            onChange={(e) => setAccountFilter(e.target.value)}
+            className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          >
+            <option value="">All</option>
+            {accounts.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.name}
+              </option>
+            ))}
+          </select>
+        </FilterField>
+        <FilterField label="Category">
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          >
+            <option value="">All</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name} ({c.type})
+              </option>
+            ))}
+          </select>
+        </FilterField>
+        <FilterField label="From">
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          />
+        </FilterField>
+        <FilterField label="To">
+          <input
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          />
+        </FilterField>
+        <FilterField label="Search payee">
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="e.g. Freshbooks"
+            className="w-48 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          />
+        </FilterField>
+      </div>
+
+      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+
+      {loading ? (
+        <p className="text-sm text-slate-500">Loading...</p>
+      ) : (
+        <>
+          <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-left text-xs font-medium uppercase text-slate-500">
+                <tr>
+                  <th className="px-4 py-2">Date</th>
+                  <th className="px-4 py-2">Payee</th>
+                  <th className="px-4 py-2">Account</th>
+                  <th className="px-4 py-2">Category</th>
+                  <th className="px-4 py-2 text-right">Amount</th>
+                  <th className="px-4 py-2">Description</th>
+                  <th className="px-4 py-2"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {transactions.map((t) => (
+                  <TransactionRowItem
+                    key={t.id}
+                    txn={t}
+                    accounts={accounts}
+                    categories={categories}
+                    onUpdate={(updates) => updateTransaction(t.id, updates)}
+                    onDelete={() => deleteTransaction(t.id)}
+                  />
+                ))}
+                {transactions.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-6 text-center text-slate-400">
+                      No transactions match these filters.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-3 text-sm text-slate-500">
+            {transactions.length} transaction{transactions.length === 1 ? "" : "s"} &middot; net{" "}
+            {centsToDollarsString(total)}
+          </p>
+        </>
+      )}
+    </div>
+  );
+}
+
+function FilterField({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="mb-1 block text-xs font-medium text-slate-500">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function TransactionRowItem({
+  txn,
+  accounts,
+  categories,
+  onUpdate,
+  onDelete,
+}: {
+  txn: TransactionRow;
+  accounts: AccountRow[];
+  categories: CategoryRow[];
+  onUpdate: (updates: Record<string, unknown>) => void;
+  onDelete: () => void;
+}) {
+  const [payee, setPayee] = useState(txn.payee);
+  const [amount, setAmount] = useState(centsToDollarsString(txn.amountCents));
+  const [description, setDescription] = useState(txn.description ?? "");
+
+  function commitPayee() {
+    if (payee !== txn.payee) onUpdate({ payee });
+  }
+  function commitAmount() {
+    try {
+      const cents = dollarsStringToCents(amount);
+      if (cents !== txn.amountCents) onUpdate({ amountCents: cents });
+    } catch {
+      setAmount(centsToDollarsString(txn.amountCents));
+    }
+  }
+  function commitDescription() {
+    if (description !== (txn.description ?? "")) onUpdate({ description });
+  }
+
+  return (
+    <tr className="hover:bg-slate-50">
+      <td className="whitespace-nowrap px-4 py-2 text-slate-500">{txn.date}</td>
+      <td className="px-4 py-2">
+        <input
+          value={payee}
+          onChange={(e) => setPayee(e.target.value)}
+          onBlur={commitPayee}
+          className="w-40 rounded border border-transparent bg-transparent px-1 py-0.5 hover:border-slate-200 focus:border-slate-400 focus:outline-none"
+        />
+      </td>
+      <td className="px-4 py-2">
+        <select
+          value={txn.accountId}
+          onChange={(e) => onUpdate({ accountId: Number(e.target.value) })}
+          className="rounded border border-transparent bg-transparent px-1 py-0.5 hover:border-slate-200 focus:border-slate-400 focus:outline-none"
+        >
+          {accounts.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.name}
+            </option>
+          ))}
+        </select>
+      </td>
+      <td className="px-4 py-2">
+        <select
+          value={txn.categoryId ?? ""}
+          onChange={(e) =>
+            onUpdate({
+              categoryId: e.target.value ? Number(e.target.value) : null,
+              categorySource: "manual",
+            })
+          }
+          className={
+            "rounded border border-transparent bg-transparent px-1 py-0.5 hover:border-slate-200 focus:border-slate-400 focus:outline-none " +
+            (txn.categoryId ? "" : "text-amber-600")
+          }
+        >
+          <option value="">Uncategorized</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name} ({c.type})
+            </option>
+          ))}
+        </select>
+      </td>
+      <td className="px-4 py-2 text-right">
+        <input
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          onBlur={commitAmount}
+          className={
+            "w-28 rounded border border-transparent bg-transparent px-1 py-0.5 text-right hover:border-slate-200 focus:border-slate-400 focus:outline-none " +
+            (txn.amountCents < 0 ? "text-red-600" : "text-emerald-700")
+          }
+        />
+      </td>
+      <td className="px-4 py-2">
+        <input
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          onBlur={commitDescription}
+          className="w-48 rounded border border-transparent bg-transparent px-1 py-0.5 text-slate-500 hover:border-slate-200 focus:border-slate-400 focus:outline-none"
+        />
+      </td>
+      <td className="px-4 py-2 text-right">
+        <button onClick={onDelete} className="text-xs text-red-600 hover:underline">
+          Delete
+        </button>
+      </td>
+    </tr>
+  );
+}

@@ -1,0 +1,137 @@
+keyword,category,type
+Payroll Transfer,Payroll Transfer,Transfer
+Owner's Comp,Owner's Transfer,Transfer
+Taxes,Tax Transfer,Transfer
+Operating Expenses,Operating Transfer,Transfer
+Unrealized Income,Unrealized Income Transfer,Transfer
+Profit,Profit Transfer,Transfer
+FRESHBOOKS,Client Payment,Income
+INTUIT,Client Payment,Income
+LION'S SHARE,Client Payment,Income
+NextScreen,Client Payment,Income
+THOMPSON SALINAS,Client Payment,Income
+Artseen,Client Payment,Income
+4OVER,Client Payment,Income
+Kgi,Client Payment,Income
+WIND ENERGY,Client Payment,Income
+E.Pak,Contractor Payment,Expense
+UBS,Client Payment,Income
+Chase,Contractor - Intl,Expense
+Google,Software,Expense
+Google G Suite,Software,Expense
+Relay,Bank Fee,Expense
+Alessandra - Spanish Account,Contractor Payment,Expense
+Alessandra,Contractor Payment,Expense
+WPMU DEV SEE WPMU.COM,Software,Expense
+Vultr,Hosting,Expense
+GUSTO,Payroll,Expense
+Pipedrive INC,Software,Expense
+Streak,Software,Expense
+FRESHBOOKS Software,Software,Expense
+Scandiweb,Contractor Payment,Expense
+PAYONEER INC,Contractor Payment,Expense
+WAVE - *PASSADO MEDIA L,Contractor Payment,Expense
+ZAPIER.COM/CHARGE,Software,Expense
+E.Pak Internatio,Client Payment,Income
+SPLAIN.IO,Software,Expense
+AT&T,Phone,Expense
+Asana,Software,Expense
+INTUIT 43463030,Client Payment,Income
+PHO VAN,Client Meal,Expense
+Cloudways,Hosting,Expense
+Figma,Software,Expense
+YELLOW PURSUIT,Marketing,Expense
+LinkedIn,Marketing,Expense
+Valero,Transportation,Expense
+Sinch Mailgun,Software,Expense
+Moz,Software,Expense
+Adobe,Software,Expense
+Marisha B Richter,Contractor Payment,Expense
+LastPass,Software,Expense
+Zoom,Software,Expense
+Ugurus,Education,Expense
+Microsoft,Software,Expense
+Innovative,Client Payment,Income
+Grammarly,Software,Expense
+Clutch.co,Marketing,Expense
+MSPBNA BANK,Transfer,Transfer
+Relume.IO,Software,Expense
+Indeed,Marketing,Expense
+Dropbox,Software,Expense
+Brentwood Oaks C,Client Payment,Income
+Surferseo,Software,Expense
+NAME-CHEAP,Software,Expense
+ALTTEXT.AI,Software,Expense
+PAYPAL *DESIGNDRIZZ,Software,Expense
+TST*PLANK SEAFOOD - AUS,Client Meal,Expense
+Moo Print,Marketing,Expense
+CLICKMINDED,Software,Expense
+ALLCLEAR ID INC,Client Payment,Income
+Nomad Sound Inc,Client Payment,Income
+WISE US INC,Contractor Payment,Expense
+Gba Firm,Client Payment,Income
+FATHOM.VIDEO,Software,Expense
+SPARKLITE,Contractor Payment,Expense
+OSBORN DESIGN WORKS,Contractor Payment,Expense
+BROWSERSTACK.COM,Contractor Payment,Expense
+FIERYFX,Contractor Payment,Expense
+ENVATO,Software,Expense
+Perplexity AI,Software,Expense
+WORK ELEVATION,Education,Expense
+ASA creative Services LLC,Client Payment,Income
+4 OVER LLC,Client Payment,Income
+TINYPNG,Software,Expense
+ENCHANTED FLORIST,Marketing,Expense
+Awesome Screenshot,Software,Expense
+SCREAMING FROG LTD,Software,Expense
+IN *BRIDGET LAUTENSACK,Contractor Payment,Expense
+GUMROAD,Software,Expense
+Credit account,Credit Card Payment,Credit Card
+Better Proposals,Software,Expense
+SEE TICKETS* BEATS ANT,Marketing,Expense
+NADEAU SINCLAIR,Contractor Payment,Expense
+AKISMET T6APTQ1557,Software,Expense
+SPLING,Software,Expense
+Wise Inc,Contractor Payment,Expense
+Madi,Payroll,Expense
+PODMATE SOFTWARE,Software,Expense
+UPTIMEROBOT,Software,Expense
+Root Down,Client Meal,Expense
+VCOWS,Software,Expense
+SP MUSSO-EU,Software,Expense
+Amazon,Software,Expense
+TBL* SEED TO STAGE,Software,Expense
+ANTONE'S RECORD,Client Payment,Income
+FIND YOUR FRIENDS III,Education,Expense
+DIGITALMARKETER,Software,Expense
+VISTAPRINT,Marketing,Expense
+Horizon Bank,Client Payment,Income
+Laurel haven homes,Client Payment,Income
+MOMENTUM PLUS,Software,Expense
+UPWORK,Marketing,Expense
+Tdcaf,Client Payment,Income
+BUGHERD,Software,Expense
+WAV*PASSADO MEDI,Contractor Payment,Expense
+APOLLO.IO,Software,Expense
+Elementor,Software,Expense
+Canva,Software,Expense
+WWW.ZMO.AI,Software,Expense
+WPMU Dev,Software,Expense
+BIG WHEEL DIGITA,Client Payment,Income
+CONSORT ENVIRONM,Client Payment,Income
+Dribbble,Marketing,Expense
+Chime,Bank Fee,Expense
+USPS,Shipping,Expense
+DOCUCLIPPER,Software,Expense
+Calendly,Software,Expense
+BEST BUY,Equipment,Expense
+IRS,Tax Payment,Expense
+PADDLE.NET* SEEDTOSTAG,Software,Expense
+TST*KOME SUSHI KITCHEN,Client Meal,Expense
+TST*RAMEN TATSU-YA - SO,Client Meal,Expense
+Other,Interest,Income
+Jesse brede,Bank Transfer,Transfer
+Income,Income (Transfer),Transfer
+Relay Income,Income,Income
+OPENAI *CHATGPT SUBSCR,Software,Expense
+THE AI BREAK SUBSTACK,Education,Expense
