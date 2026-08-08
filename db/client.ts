@@ -20,7 +20,12 @@ function getSqlite(): Database.Database {
     process.env.DATABASE_PATH ?? path.join(process.cwd(), "data", "bookkeeping.sqlite");
   fs.mkdirSync(path.dirname(DATABASE_PATH), { recursive: true });
   _sqlite = new Database(DATABASE_PATH);
-  _sqlite.pragma("journal_mode = WAL");
+  // Not WAL: WAL mode depends on mmap'd shared memory between the main db
+  // file and its -wal/-shm siblings, which Docker Desktop's virtualized
+  // bind-mount filesystem on macOS doesn't reliably support and can crash
+  // on. This app is single-process/single-writer, so WAL's concurrent-
+  // reader benefit doesn't apply here anyway.
+  _sqlite.pragma("journal_mode = DELETE");
   _sqlite.pragma("foreign_keys = ON");
   return _sqlite;
 }
