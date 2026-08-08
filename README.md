@@ -16,12 +16,18 @@ container.
 2. `docker compose up --build`
 3. Open `http://localhost:3000` and sign in with `ADMIN_PASSWORD`.
 
-The SQLite database lives in `./data` and uploaded CSV/PDF files in
-`./uploads`, both mounted as volumes so they persist across container
-restarts/rebuilds. On first boot the app auto-migrates the schema and seeds
-the Category Map (imported from the original spreadsheet) and the ten known
+The SQLite database lives in a Docker-managed named volume (`sqlite_data`)
+and uploaded CSV/PDF files in `./uploads` (a regular bind mount), so both
+persist across container restarts/rebuilds. The database uses a named
+volume rather than a bind mount because SQLite's file locking isn't
+reliably supported over Docker Desktop's virtualized bind-mount filesystem
+on macOS. On first boot the app auto-migrates the schema and seeds the
+Category Map (imported from the original spreadsheet) and the ten known
 Relay/Chase accounts with $0 opening balances — set real opening balances
 under **Accounts** before importing transactions.
+
+To back up the database: `docker run --rm -v bookkeeping_sqlite_data:/data -v "$(pwd)":/backup alpine cp /data/bookkeeping.sqlite /backup/bookkeeping-backup.sqlite`
+(volume name may be prefixed differently depending on your project/folder name — check with `docker volume ls`).
 
 If this is exposed beyond your local network, put it behind a reverse proxy
 (Caddy, Traefik, nginx) for TLS — the app itself only serves plain HTTP.
