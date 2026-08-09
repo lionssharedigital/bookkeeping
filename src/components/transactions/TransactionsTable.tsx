@@ -5,6 +5,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { AccountRow, CategoryRow, TransactionRow } from "@/lib/types";
 import { centsToDollarsString, dollarsStringToCents } from "@/lib/money";
 import { SortableHeader, compareForSort, type SortDirection } from "@/components/ui/SortableHeader";
+import { TableSkeleton } from "@/components/ui/Skeleton";
+import EmptyState from "@/components/ui/EmptyState";
 import { usePersistedState } from "@/lib/usePersistedState";
 
 type SortField = "date" | "payee" | "account" | "category" | "amount" | "description";
@@ -147,38 +149,35 @@ export default function TransactionsTable() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Transactions</h1>
+        <h1 className="font-display text-lg font-semibold">Transactions</h1>
         <div className="flex items-center gap-3">
           <button
             onClick={reprocessCategories}
             disabled={reprocessing}
             title="Re-apply Category Map rules to uncategorized and auto-matched transactions. Manually-set categories are never overwritten."
-            className="rounded-md border border-slate-300 px-4 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+            className="btn-secondary px-4 py-1.5 text-sm font-medium disabled:opacity-50"
           >
             {reprocessing ? "Reprocessing..." : "Reprocess categories"}
           </button>
-          <Link
-            href="/transactions/new"
-            className="rounded-md bg-slate-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-slate-700"
-          >
+          <Link href="/transactions/new" className="btn-primary px-4 py-1.5 text-sm font-medium">
             + New transaction
           </Link>
         </div>
       </div>
 
       {reprocessResult && (
-        <p className="mb-4 text-sm text-emerald-700">
+        <p className="mb-4 text-sm text-success">
           Scanned {reprocessResult.scanned} uncategorized/auto-matched transaction
           {reprocessResult.scanned === 1 ? "" : "s"} &middot; updated {reprocessResult.updated}.
         </p>
       )}
 
-      <div className="mb-4 flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4">
+      <div className="surface-card mb-4 flex flex-wrap items-end gap-3 p-4">
         <FilterField label="Account">
           <select
             value={accountFilter}
             onChange={(e) => setAccountFilter(e.target.value)}
-            className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="control-input px-2 py-1.5 text-sm"
           >
             <option value="">All</option>
             {accounts.map((a) => (
@@ -192,7 +191,7 @@ export default function TransactionsTable() {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="control-input px-2 py-1.5 text-sm"
           >
             <option value="">All</option>
             {categories.map((c) => (
@@ -207,7 +206,7 @@ export default function TransactionsTable() {
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="control-input px-2 py-1.5 text-sm"
           />
         </FilterField>
         <FilterField label="To">
@@ -215,7 +214,7 @@ export default function TransactionsTable() {
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="control-input px-2 py-1.5 text-sm"
           />
         </FilterField>
         <FilterField label="Search payee">
@@ -223,20 +222,30 @@ export default function TransactionsTable() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="e.g. Freshbooks"
-            className="w-48 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="control-input w-48 px-2 py-1.5 text-sm"
           />
         </FilterField>
       </div>
 
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-sm text-error">{error}</p>}
 
       {loading ? (
-        <p className="text-sm text-slate-500">Loading...</p>
+        <TableSkeleton columns={7} rows={10} />
+      ) : transactions.length === 0 && !accountFilter && !categoryFilter && !dateFrom && !dateTo && !q ? (
+        <EmptyState
+          title="No transactions yet"
+          message="Add one by hand or import a CSV/PDF statement to get started."
+          action={
+            <Link href="/import" className="btn-primary inline-block px-4 py-1.5 text-sm font-medium">
+              Import transactions
+            </Link>
+          }
+        />
       ) : (
         <>
-          <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+          <div className="table-shell overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-xs font-medium uppercase text-slate-500">
+              <thead className="text-left text-xs font-medium uppercase">
                 <tr>
                   <SortableHeader
                     label="Date"
@@ -284,7 +293,7 @@ export default function TransactionsTable() {
                   <th className="px-4 py-2"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody>
                 {sortedTransactions.map((t) => (
                   <TransactionRowItem
                     key={t.id}
@@ -297,7 +306,7 @@ export default function TransactionsTable() {
                 ))}
                 {transactions.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-4 py-6 text-center text-slate-400">
+                    <td colSpan={7} className="px-4 py-10 text-center text-text-muted">
                       No transactions match these filters.
                     </td>
                   </tr>
@@ -305,11 +314,11 @@ export default function TransactionsTable() {
               </tbody>
             </table>
           </div>
-          <p className="mt-3 text-sm text-slate-500">
+          <p className="mt-3 text-sm text-text-muted">
             {transactions.length} transaction{transactions.length === 1 ? "" : "s"} &middot; net{" "}
             {centsToDollarsString(total)}
             {transactions.length >= 10000 && (
-              <span className="ml-2 text-amber-600">
+              <span className="ml-2 text-warning">
                 (showing the first 10,000 &mdash; narrow with filters above to see the rest)
               </span>
             )}
@@ -323,7 +332,7 @@ export default function TransactionsTable() {
 function FilterField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="mb-1 block text-xs font-medium text-slate-500">{label}</label>
+      <label className="mb-1 block text-xs font-medium text-text-muted">{label}</label>
       {children}
     </div>
   );
@@ -361,22 +370,20 @@ function TransactionRowItem({
     if (description !== (txn.description ?? "")) onUpdate({ description });
   }
 
+  const inlineInput =
+    "rounded border border-transparent bg-transparent px-1 py-0.5 transition-colors hover:border-border-strong focus:border-accent focus:outline-none";
+
   return (
-    <tr className="hover:bg-slate-50">
-      <td className="whitespace-nowrap px-4 py-2 text-slate-500">{txn.date}</td>
+    <tr>
+      <td className="whitespace-nowrap px-4 py-2 text-text-muted">{txn.date}</td>
       <td className="px-4 py-2">
-        <input
-          value={payee}
-          onChange={(e) => setPayee(e.target.value)}
-          onBlur={commitPayee}
-          className="w-40 rounded border border-transparent bg-transparent px-1 py-0.5 hover:border-slate-200 focus:border-slate-400 focus:outline-none"
-        />
+        <input value={payee} onChange={(e) => setPayee(e.target.value)} onBlur={commitPayee} className={`w-40 ${inlineInput}`} />
       </td>
       <td className="px-4 py-2">
         <select
           value={txn.accountId}
           onChange={(e) => onUpdate({ accountId: Number(e.target.value) })}
-          className="rounded border border-transparent bg-transparent px-1 py-0.5 hover:border-slate-200 focus:border-slate-400 focus:outline-none"
+          className={inlineInput}
         >
           {accounts.map((a) => (
             <option key={a.id} value={a.id}>
@@ -394,10 +401,7 @@ function TransactionRowItem({
               categorySource: "manual",
             })
           }
-          className={
-            "rounded border border-transparent bg-transparent px-1 py-0.5 hover:border-slate-200 focus:border-slate-400 focus:outline-none " +
-            (txn.categoryId ? "" : "text-amber-600")
-          }
+          className={inlineInput + (txn.categoryId ? "" : " text-warning")}
         >
           <option value="">Uncategorized</option>
           {categories.map((c) => (
@@ -412,10 +416,7 @@ function TransactionRowItem({
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           onBlur={commitAmount}
-          className={
-            "w-28 rounded border border-transparent bg-transparent px-1 py-0.5 text-right hover:border-slate-200 focus:border-slate-400 focus:outline-none " +
-            (txn.amountCents < 0 ? "text-red-600" : "text-emerald-700")
-          }
+          className={`w-28 text-right ${inlineInput} ` + (txn.amountCents < 0 ? "text-error" : "text-success")}
         />
       </td>
       <td className="px-4 py-2">
@@ -423,11 +424,11 @@ function TransactionRowItem({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           onBlur={commitDescription}
-          className="w-48 rounded border border-transparent bg-transparent px-1 py-0.5 text-slate-500 hover:border-slate-200 focus:border-slate-400 focus:outline-none"
+          className={`w-48 text-text-muted ${inlineInput}`}
         />
       </td>
       <td className="px-4 py-2 text-right">
-        <button onClick={onDelete} className="text-xs text-red-600 hover:underline">
+        <button onClick={onDelete} className="text-xs text-error transition-opacity hover:opacity-70">
           Delete
         </button>
       </td>

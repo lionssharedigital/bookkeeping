@@ -50,14 +50,14 @@ export default function ImportUpload() {
 
   return (
     <div className="max-w-lg">
-      <h1 className="mb-6 text-lg font-semibold">Import transactions</h1>
-      <form onSubmit={handleUpload} className="space-y-4 rounded-lg border border-slate-200 bg-white p-6">
+      <h1 className="mb-6 font-display text-lg font-semibold">Import transactions</h1>
+      <form onSubmit={handleUpload} className="surface-card space-y-4 p-6">
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">Account</label>
+          <label className="mb-1 block text-xs font-medium text-text-muted">Account</label>
           <select
             value={accountId}
             onChange={(e) => setAccountId(Number(e.target.value))}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="control-input w-full px-3 py-2 text-sm"
           >
             {accounts.map((a) => (
               <option key={a.id} value={a.id}>
@@ -67,25 +67,21 @@ export default function ImportUpload() {
           </select>
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">CSV or PDF file</label>
+          <label className="mb-1 block text-xs font-medium text-text-muted">CSV or PDF file</label>
           <input
             ref={fileInputRef}
             type="file"
             accept=".csv,text/csv,.pdf,application/pdf"
             className="w-full text-sm"
           />
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-text-muted">
             Export a CSV from Relay or Chase, or upload a bank statement PDF (best-effort
             extraction). You&apos;ll map columns and review categorization on the next screen
             before anything is saved.
           </p>
         </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <button
-          type="submit"
-          disabled={uploading}
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-        >
+        {error && <p className="text-sm text-error">{error}</p>}
+        <button type="submit" disabled={uploading} className="btn-primary px-4 py-2 text-sm font-medium disabled:opacity-50">
           {uploading ? "Uploading..." : "Upload & continue"}
         </button>
       </form>

@@ -22,7 +22,7 @@ export function SortableHeader<T extends string>({
     <th
       onClick={() => onSort(field)}
       className={
-        "cursor-pointer select-none px-4 py-2 hover:text-slate-700 " +
+        "cursor-pointer select-none px-4 py-2 transition-colors hover:text-text " +
         (align === "right" ? "text-right" : "text-left")
       }
     >
@@ -37,8 +37,11 @@ export function SortableHeader<T extends string>({
 
 function SortArrow({ active, direction }: { active: boolean; direction: SortDirection }) {
   return (
-    <span className={active ? "text-slate-700" : "text-slate-300"}>
-      {active && direction === "desc" ? "▼" : "▲"}
+    <span
+      className={"text-[10px] transition-all duration-150 " + (active ? "text-accent" : "text-border-strong")}
+      style={{ transform: active && direction === "desc" ? "rotate(0deg)" : "rotate(180deg)" }}
+    >
+      ▼
     </span>
   );
 }

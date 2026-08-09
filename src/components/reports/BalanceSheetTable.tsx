@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { centsToDollarsString } from "@/lib/money";
 import { usePersistedState } from "@/lib/usePersistedState";
+import { TableSkeleton } from "@/components/ui/Skeleton";
 
 interface AccountRow {
   accountId: number;
@@ -46,24 +47,24 @@ export default function BalanceSheetTable() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Balance Sheet</h1>
+        <h1 className="font-display text-lg font-semibold">Balance Sheet</h1>
         <div className="flex items-center gap-2 text-sm">
-          <label className="text-slate-500">As of</label>
+          <label className="text-text-muted">As of</label>
           <input
             type="date"
             value={asOfDate}
             onChange={(e) => setAsOfDate(e.target.value)}
-            className="rounded-md border border-slate-300 px-2 py-1.5"
+            className="control-input px-2 py-1.5"
           />
         </div>
       </div>
 
       {loading || !report ? (
-        <p className="text-sm text-slate-500">Loading...</p>
+        <TableSkeleton columns={4} rows={8} />
       ) : (
-        <div className="max-w-2xl overflow-hidden rounded-lg border border-slate-200 bg-white">
+        <div className="table-shell max-w-2xl">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-medium uppercase text-slate-500">
+            <thead className="text-left text-xs font-medium uppercase">
               <tr>
                 <th className="px-4 py-2">Account</th>
                 <th className="px-4 py-2 text-right">Opening</th>
@@ -71,9 +72,9 @@ export default function BalanceSheetTable() {
                 <th className="px-4 py-2 text-right">Ending</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
-              <tr className="bg-slate-100">
-                <td colSpan={4} className="px-4 py-1.5 text-xs font-semibold text-slate-600">
+            <tbody>
+              <tr className="bg-hover">
+                <td colSpan={4} className="px-4 py-1.5 text-xs font-semibold text-text-muted">
                   ASSETS (Cash)
                 </td>
               </tr>
@@ -87,8 +88,8 @@ export default function BalanceSheetTable() {
                 ending={report.totalAssetsEnding}
               />
 
-              <tr className="bg-slate-100">
-                <td colSpan={4} className="px-4 py-1.5 text-xs font-semibold text-slate-600">
+              <tr className="bg-hover">
+                <td colSpan={4} className="px-4 py-1.5 text-xs font-semibold text-text-muted">
                   LIABILITIES
                 </td>
               </tr>
@@ -102,8 +103,8 @@ export default function BalanceSheetTable() {
                 ending={report.totalLiabilitiesEnding}
               />
 
-              <tr className="bg-slate-100">
-                <td colSpan={4} className="px-4 py-1.5 text-xs font-semibold text-slate-600">
+              <tr className="bg-hover">
+                <td colSpan={4} className="px-4 py-1.5 text-xs font-semibold text-text-muted">
                   EQUITY
                 </td>
               </tr>
@@ -121,7 +122,7 @@ export default function BalanceSheetTable() {
                   {centsToDollarsString(report.netChangeInCash)}
                 </td>
               </tr>
-              <tr className="bg-slate-50 font-semibold">
+              <tr className="bg-hover font-semibold">
                 <td className="px-4 py-1.5">TOTAL EQUITY</td>
                 <td colSpan={2}></td>
                 <td className="px-4 py-1.5 text-right">{centsToDollarsString(report.totalEquity)}</td>
@@ -143,12 +144,12 @@ export default function BalanceSheetTable() {
 
 function BalanceRow({ row }: { row: AccountRow }) {
   return (
-    <tr className="hover:bg-slate-50">
+    <tr>
       <td className="px-4 py-1.5">{row.name}</td>
-      <td className="px-4 py-1.5 text-right text-slate-600">
+      <td className="px-4 py-1.5 text-right text-text-muted">
         {centsToDollarsString(row.openingBalanceCents)}
       </td>
-      <td className="px-4 py-1.5 text-right text-slate-600">
+      <td className="px-4 py-1.5 text-right text-text-muted">
         {centsToDollarsString(row.activityCents)}
       </td>
       <td className="px-4 py-1.5 text-right font-medium">
@@ -170,7 +171,7 @@ function TotalRow({
   ending: number;
 }) {
   return (
-    <tr className="bg-slate-50 font-semibold">
+    <tr className="bg-hover font-semibold">
       <td className="px-4 py-1.5">{label}</td>
       <td className="px-4 py-1.5 text-right">{centsToDollarsString(opening)}</td>
       <td className="px-4 py-1.5 text-right">{centsToDollarsString(activity)}</td>

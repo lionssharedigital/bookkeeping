@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CategoryMapRuleRow, CategoryRow, CategoryType } from "@/lib/types";
 import { SortableHeader, compareForSort, type SortDirection } from "@/components/ui/SortableHeader";
+import { TableSkeleton } from "@/components/ui/Skeleton";
 import { usePersistedState } from "@/lib/usePersistedState";
 
 const TYPES: CategoryType[] = ["Income", "Expense", "Transfer", "Credit Card"];
@@ -140,38 +141,35 @@ export default function CategoryMapTable() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Category Map</h1>
+        <h1 className="font-display text-lg font-semibold">Category Map</h1>
         <input
           placeholder="Filter by keyword or category..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="w-72 rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+          className="control-input w-72 px-3 py-1.5 text-sm"
         />
       </div>
 
-      <form
-        onSubmit={addRule}
-        className="mb-6 flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4"
-      >
+      <form onSubmit={addRule} className="surface-card mb-6 flex flex-wrap items-end gap-3 p-4">
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">
+          <label className="mb-1 block text-xs font-medium text-text-muted">
             Payee keyword
           </label>
           <input
             value={newKeyword}
             onChange={(e) => setNewKeyword(e.target.value)}
             placeholder="e.g. FRESHBOOKS"
-            className="w-48 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="control-input w-48 px-2 py-1.5 text-sm"
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">Category</label>
+          <label className="mb-1 block text-xs font-medium text-text-muted">Category</label>
           <input
             list="category-name-options"
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value)}
             placeholder="e.g. Software"
-            className="w-48 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="control-input w-48 px-2 py-1.5 text-sm"
           />
           <datalist id="category-name-options">
             {categoryNames.map((name) => (
@@ -180,11 +178,11 @@ export default function CategoryMapTable() {
           </datalist>
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">Type</label>
+          <label className="mb-1 block text-xs font-medium text-text-muted">Type</label>
           <select
             value={newType}
             onChange={(e) => setNewType(e.target.value as CategoryType)}
-            className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="control-input px-2 py-1.5 text-sm"
           >
             {TYPES.map((t) => (
               <option key={t} value={t}>
@@ -193,23 +191,19 @@ export default function CategoryMapTable() {
             ))}
           </select>
         </div>
-        <button
-          type="submit"
-          disabled={saving}
-          className="rounded-md bg-slate-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-        >
+        <button type="submit" disabled={saving} className="btn-primary px-4 py-1.5 text-sm font-medium disabled:opacity-50">
           Add rule
         </button>
       </form>
 
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-sm text-error">{error}</p>}
 
       {loading ? (
-        <p className="text-sm text-slate-500">Loading...</p>
+        <TableSkeleton columns={6} rows={8} />
       ) : (
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+        <div className="table-shell">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-medium uppercase text-slate-500">
+            <thead className="text-left text-xs font-medium uppercase">
               <tr>
                 <SortableHeader
                   label="Keyword"
@@ -243,7 +237,7 @@ export default function CategoryMapTable() {
                 <th className="px-4 py-2"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {filteredRules.map((rule) => (
                 <RuleRow
                   key={rule.id}
@@ -254,8 +248,8 @@ export default function CategoryMapTable() {
               ))}
               {filteredRules.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-6 text-center text-slate-400">
-                    No rules match.
+                  <td colSpan={6} className="px-4 py-10 text-center text-text-muted">
+                    {filter ? `No rules match "${filter}".` : "No category map rules yet."}
                   </td>
                 </tr>
               )}
@@ -294,13 +288,13 @@ function RuleRow({
   }
 
   return (
-    <tr className="hover:bg-slate-50">
+    <tr>
       <td className="px-4 py-2">
         <input
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           onBlur={commitKeyword}
-          className="w-full rounded border border-transparent bg-transparent px-1 py-0.5 hover:border-slate-200 focus:border-slate-400 focus:outline-none"
+          className="w-full rounded border border-transparent bg-transparent px-1 py-0.5 transition-colors hover:border-border-strong focus:border-accent focus:outline-none"
         />
       </td>
       <td className="px-4 py-2">
@@ -309,7 +303,7 @@ function RuleRow({
           value={categoryName}
           onChange={(e) => setCategoryName(e.target.value)}
           onBlur={commitCategory}
-          className="w-full rounded border border-transparent bg-transparent px-1 py-0.5 hover:border-slate-200 focus:border-slate-400 focus:outline-none"
+          className="w-full rounded border border-transparent bg-transparent px-1 py-0.5 transition-colors hover:border-border-strong focus:border-accent focus:outline-none"
         />
       </td>
       <td className="px-4 py-2">
@@ -319,7 +313,7 @@ function RuleRow({
             setCategoryType(e.target.value as CategoryType);
           }}
           onBlur={commitCategory}
-          className="rounded border border-transparent bg-transparent px-1 py-0.5 hover:border-slate-200 focus:border-slate-400 focus:outline-none"
+          className="rounded border border-transparent bg-transparent px-1 py-0.5 transition-colors hover:border-border-strong focus:border-accent focus:outline-none"
         >
           {TYPES.map((t) => (
             <option key={t} value={t}>
@@ -334,7 +328,7 @@ function RuleRow({
           value={priority}
           onChange={(e) => setPriority(Number(e.target.value))}
           onBlur={commitPriority}
-          className="w-16 rounded border border-transparent bg-transparent px-1 py-0.5 hover:border-slate-200 focus:border-slate-400 focus:outline-none"
+          className="w-16 rounded border border-transparent bg-transparent px-1 py-0.5 transition-colors hover:border-border-strong focus:border-accent focus:outline-none"
         />
       </td>
       <td className="px-4 py-2">
@@ -345,7 +339,7 @@ function RuleRow({
         />
       </td>
       <td className="px-4 py-2 text-right">
-        <button onClick={onDelete} className="text-xs text-red-600 hover:underline">
+        <button onClick={onDelete} className="text-xs text-error transition-opacity hover:opacity-70">
           Delete
         </button>
       </td>

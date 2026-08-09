@@ -74,8 +74,8 @@ export default function PnlChart({
   }
 
   return (
-    <div className="relative mb-6 rounded-lg border border-slate-200 bg-white p-4">
-      <div className="mb-3 flex items-center gap-4 text-xs text-slate-600">
+    <div className="surface-card relative mb-6 p-4">
+      <div className="mb-3 flex items-center gap-4 text-xs text-text-muted">
         <LegendSwatch color={INCOME_COLOR} label="Income" />
         <LegendSwatch color={EXPENSE_COLOR} label="Expense" />
       </div>
@@ -98,7 +98,7 @@ export default function PnlChart({
                     x2={PLOT_WIDTH}
                     y1={y}
                     y2={y}
-                    stroke="#e1e0d9"
+                    stroke="var(--grid-line)"
                     strokeWidth={1}
                   />
                   <text
@@ -107,7 +107,7 @@ export default function PnlChart({
                     textAnchor="end"
                     dominantBaseline="middle"
                     fontSize={10}
-                    fill="#898781"
+                    fill="var(--text-muted)"
                   >
                     {centsToDollarsString(value).replace(".00", "")}
                   </text>
@@ -119,7 +119,7 @@ export default function PnlChart({
               x2={PLOT_WIDTH}
               y1={PLOT_HEIGHT}
               y2={PLOT_HEIGHT}
-              stroke="#c3c2b7"
+              stroke="var(--border-strong)"
               strokeWidth={1}
             />
 
@@ -137,7 +137,7 @@ export default function PnlChart({
                     y={PLOT_HEIGHT + 16}
                     textAnchor="middle"
                     fontSize={10}
-                    fill="#898781"
+                    fill="var(--text-muted)"
                   >
                     {month}
                   </text>
@@ -148,7 +148,7 @@ export default function PnlChart({
                     height={Math.max(0, PLOT_HEIGHT - incomeY)}
                     rx={4}
                     fill={INCOME_COLOR}
-                    className="cursor-default"
+                    className="cursor-default transition-opacity duration-150 hover:opacity-80"
                     onMouseEnter={(e) => {
                       const rect = e.currentTarget.getBoundingClientRect();
                       setHovered({
@@ -168,7 +168,7 @@ export default function PnlChart({
                     height={Math.max(0, PLOT_HEIGHT - expenseY)}
                     rx={4}
                     fill={EXPENSE_COLOR}
-                    className="cursor-default"
+                    className="cursor-default transition-opacity duration-150 hover:opacity-80"
                     onMouseEnter={(e) => {
                       const rect = e.currentTarget.getBoundingClientRect();
                       setHovered({
@@ -190,11 +190,11 @@ export default function PnlChart({
 
       {hovered && (
         <div
-          className="pointer-events-none fixed z-10 -translate-x-1/2 -translate-y-full rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs shadow-md"
+          className="surface-card pointer-events-none fixed z-10 -translate-x-1/2 -translate-y-full px-2.5 py-1.5 text-xs shadow-md"
           style={{ left: hovered.x, top: hovered.y - 8 }}
         >
-          <div className="font-semibold text-slate-900">{centsToDollarsString(hovered.valueCents)}</div>
-          <div className="text-slate-500">
+          <div className="font-semibold">{centsToDollarsString(hovered.valueCents)}</div>
+          <div className="text-text-muted">
             {hovered.series} &middot; {hovered.month}
           </div>
         </div>

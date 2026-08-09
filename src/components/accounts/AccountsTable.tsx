@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import type { AccountRow, AccountType } from "@/lib/types";
 import { centsToDollarsString, dollarsStringToCents } from "@/lib/money";
 import { SortableHeader, compareForSort, type SortDirection } from "@/components/ui/SortableHeader";
+import { TableSkeleton } from "@/components/ui/Skeleton";
+import EmptyState from "@/components/ui/EmptyState";
 import { usePersistedState } from "@/lib/usePersistedState";
 
 const ACCOUNT_TYPES: AccountType[] = ["bank", "credit_card"];
@@ -129,8 +131,8 @@ export default function AccountsTable() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Accounts</h1>
-        <label className="flex items-center gap-2 text-sm text-slate-500">
+        <h1 className="font-display text-lg font-semibold">Accounts</h1>
+        <label className="flex items-center gap-2 text-sm text-text-muted">
           <input
             type="checkbox"
             checked={showArchived}
@@ -140,34 +142,31 @@ export default function AccountsTable() {
         </label>
       </div>
 
-      <form
-        onSubmit={addAccount}
-        className="mb-6 flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4"
-      >
+      <form onSubmit={addAccount} className="surface-card mb-6 flex flex-wrap items-end gap-3 p-4">
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">Name</label>
+          <label className="mb-1 block text-xs font-medium text-text-muted">Name</label>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Operating Expenses"
-            className="w-48 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="control-input w-48 px-2 py-1.5 text-sm"
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">Institution</label>
+          <label className="mb-1 block text-xs font-medium text-text-muted">Institution</label>
           <input
             value={institution}
             onChange={(e) => setInstitution(e.target.value)}
             placeholder="e.g. Relay"
-            className="w-32 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="control-input w-32 px-2 py-1.5 text-sm"
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">Type</label>
+          <label className="mb-1 block text-xs font-medium text-text-muted">Type</label>
           <select
             value={accountType}
             onChange={(e) => setAccountType(e.target.value as AccountType)}
-            className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="control-input px-2 py-1.5 text-sm"
           >
             {ACCOUNT_TYPES.map((t) => (
               <option key={t} value={t}>
@@ -177,42 +176,43 @@ export default function AccountsTable() {
           </select>
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">
+          <label className="mb-1 block text-xs font-medium text-text-muted">
             Opening balance
           </label>
           <input
             value={openingBalance}
             onChange={(e) => setOpeningBalance(e.target.value)}
             placeholder="0.00"
-            className="w-28 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="control-input w-28 px-2 py-1.5 text-sm"
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">As of</label>
+          <label className="mb-1 block text-xs font-medium text-text-muted">As of</label>
           <input
             type="date"
             value={openingDate}
             onChange={(e) => setOpeningDate(e.target.value)}
-            className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="control-input px-2 py-1.5 text-sm"
           />
         </div>
-        <button
-          type="submit"
-          disabled={saving}
-          className="rounded-md bg-slate-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-        >
+        <button type="submit" disabled={saving} className="btn-primary px-4 py-1.5 text-sm font-medium disabled:opacity-50">
           Add account
         </button>
       </form>
 
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-sm text-error">{error}</p>}
 
       {loading ? (
-        <p className="text-sm text-slate-500">Loading...</p>
+        <TableSkeleton columns={6} rows={5} />
+      ) : visibleAccounts.length === 0 ? (
+        <EmptyState
+          title="No accounts yet"
+          message="Add your first account above to start tracking balances."
+        />
       ) : (
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+        <div className="table-shell">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-medium uppercase text-slate-500">
+            <thead className="text-left text-xs font-medium uppercase">
               <tr>
                 <SortableHeader
                   label="Name"
@@ -252,7 +252,7 @@ export default function AccountsTable() {
                 <th className="px-4 py-2"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {visibleAccounts.map((a) => (
                 <AccountRowItem
                   key={a.id}
@@ -290,10 +290,10 @@ function AccountRowItem({
   }
 
   return (
-    <tr className={`hover:bg-slate-50 ${account.isArchived ? "opacity-50" : ""}`}>
+    <tr className={account.isArchived ? "opacity-50" : ""}>
       <td className="px-4 py-2 font-medium">{account.name}</td>
-      <td className="px-4 py-2 text-slate-500">{account.institution}</td>
-      <td className="px-4 py-2 text-slate-500">
+      <td className="px-4 py-2 text-text-muted">{account.institution}</td>
+      <td className="px-4 py-2 text-text-muted">
         {account.accountType === "bank" ? "Bank" : "Credit Card"}
       </td>
       <td className="px-4 py-2">
@@ -301,7 +301,7 @@ function AccountRowItem({
           value={balance}
           onChange={(e) => setBalance(e.target.value)}
           onBlur={commitBalance}
-          className="w-28 rounded border border-transparent bg-transparent px-1 py-0.5 hover:border-slate-200 focus:border-slate-400 focus:outline-none"
+          className="w-28 rounded border border-transparent bg-transparent px-1 py-0.5 transition-colors hover:border-border-strong focus:border-accent focus:outline-none"
         />
       </td>
       <td className="px-4 py-2">
@@ -313,12 +313,12 @@ function AccountRowItem({
               onUpdate({ openingBalanceDate: e.target.value });
             }
           }}
-          className="rounded border border-transparent bg-transparent px-1 py-0.5 hover:border-slate-200 focus:border-slate-400 focus:outline-none"
+          className="rounded border border-transparent bg-transparent px-1 py-0.5 transition-colors hover:border-border-strong focus:border-accent focus:outline-none"
         />
       </td>
       <td className="px-4 py-2 text-right">
         {!account.isArchived && (
-          <button onClick={onArchive} className="text-xs text-red-600 hover:underline">
+          <button onClick={onArchive} className="text-xs text-error transition-opacity hover:opacity-70">
             Archive
           </button>
         )}

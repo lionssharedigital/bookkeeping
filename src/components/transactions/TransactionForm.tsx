@@ -101,14 +101,14 @@ export default function TransactionForm() {
 
   return (
     <div className="max-w-xl">
-      <h1 className="mb-6 text-lg font-semibold">New transaction</h1>
-      <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-200 bg-white p-6">
+      <h1 className="mb-6 font-display text-lg font-semibold">New transaction</h1>
+      <form onSubmit={handleSubmit} className="surface-card space-y-4 p-6">
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">Account</label>
+          <label className="mb-1 block text-xs font-medium text-text-muted">Account</label>
           <select
             value={accountId}
             onChange={(e) => setAccountId(Number(e.target.value))}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="control-input w-full px-3 py-2 text-sm"
           >
             {accounts.map((a) => (
               <option key={a.id} value={a.id}>
@@ -120,45 +120,45 @@ export default function TransactionForm() {
 
         <div className="flex gap-4">
           <div className="flex-1">
-            <label className="mb-1 block text-xs font-medium text-slate-500">Date</label>
+            <label className="mb-1 block text-xs font-medium text-text-muted">Date</label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              className="control-input w-full px-3 py-2 text-sm"
             />
           </div>
           <div className="flex-1">
-            <label className="mb-1 block text-xs font-medium text-slate-500">
+            <label className="mb-1 block text-xs font-medium text-text-muted">
               Amount (negative = expense)
             </label>
             <input
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="-42.50"
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              className="control-input w-full px-3 py-2 text-sm"
             />
           </div>
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">Payee</label>
+          <label className="mb-1 block text-xs font-medium text-text-muted">Payee</label>
           <input
             value={payee}
             onChange={(e) => setPayee(e.target.value)}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="control-input w-full px-3 py-2 text-sm"
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">Category</label>
+          <label className="mb-1 block text-xs font-medium text-text-muted">Category</label>
           <select
             value={categoryId}
             onChange={(e) => {
               setCategoryId(e.target.value ? Number(e.target.value) : "");
               setMatchedRuleId(null);
             }}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="control-input w-full px-3 py-2 text-sm"
           >
             <option value="">Uncategorized</option>
             {categories.map((c) => (
@@ -168,44 +168,40 @@ export default function TransactionForm() {
             ))}
           </select>
           {suggestion && (
-            <p className="mt-1 text-xs text-emerald-700">
+            <p className="mt-1 text-xs text-success">
               Auto-suggested: {suggestion.categoryName} ({suggestion.categoryType})
             </p>
           )}
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">Description</label>
+          <label className="mb-1 block text-xs font-medium text-text-muted">Description</label>
           <input
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="control-input w-full px-3 py-2 text-sm"
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">Reference</label>
+          <label className="mb-1 block text-xs font-medium text-text-muted">Reference</label>
           <input
             value={reference}
             onChange={(e) => setReference(e.target.value)}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="control-input w-full px-3 py-2 text-sm"
           />
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-error">{error}</p>}
 
         <div className="flex gap-3 pt-2">
-          <button
-            type="submit"
-            disabled={saving}
-            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-          >
+          <button type="submit" disabled={saving} className="btn-primary px-4 py-2 text-sm font-medium disabled:opacity-50">
             {saving ? "Saving..." : "Add transaction"}
           </button>
           <button
             type="button"
             onClick={() => router.push("/transactions")}
-            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="btn-secondary px-4 py-2 text-sm font-medium"
           >
             Cancel
           </button>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { centsToDollarsString } from "@/lib/money";
 import { usePersistedState } from "@/lib/usePersistedState";
+import { TableSkeleton } from "@/components/ui/Skeleton";
 import PnlChart from "./PnlChart";
 
 const MONTH_LABELS = [
@@ -54,18 +55,18 @@ export default function PnlTable() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Profit &amp; Loss</h1>
+        <h1 className="font-display text-lg font-semibold">Profit &amp; Loss</h1>
         <div className="flex items-center gap-2 text-sm">
           <button
             onClick={() => setYear((y) => y - 1)}
-            className="rounded border border-slate-300 px-2 py-1 hover:bg-slate-50"
+            className="btn-secondary h-8 w-8 rounded-full text-center"
           >
             &larr;
           </button>
-          <span className="font-medium">{year}</span>
+          <span className="w-12 text-center font-medium">{year}</span>
           <button
             onClick={() => setYear((y) => y + 1)}
-            className="rounded border border-slate-300 px-2 py-1 hover:bg-slate-50"
+            className="btn-secondary h-8 w-8 rounded-full text-center"
           >
             &rarr;
           </button>
@@ -73,15 +74,15 @@ export default function PnlTable() {
       </div>
 
       {loading || !report ? (
-        <p className="text-sm text-slate-500">Loading...</p>
+        <TableSkeleton columns={13} rows={8} />
       ) : (
         <>
           <PnlChart incomeMonthly={report.incomeMonthly} expenseMonthly={report.expenseMonthly} />
-          <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+          <div className="table-shell overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-medium uppercase text-slate-500">
+            <thead className="text-left text-xs font-medium uppercase">
               <tr>
-                <th className="sticky left-0 bg-slate-50 px-3 py-2">Category</th>
+                <th className="sticky left-0 bg-bg px-3 py-2">Category</th>
                 {MONTH_LABELS.map((m) => (
                   <th key={m} className="px-3 py-2 text-right">
                     {m}
@@ -90,7 +91,7 @@ export default function PnlTable() {
                 <th className="px-3 py-2 text-right">YTD</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               <SectionHeader label="INCOME" />
               {report.income.map((c) => (
                 <CategoryRow key={c.categoryId} row={c} />
@@ -119,8 +120,8 @@ export default function PnlTable() {
 
 function SectionHeader({ label }: { label: string }) {
   return (
-    <tr className="bg-slate-100">
-      <td colSpan={14} className="px-3 py-1.5 text-xs font-semibold text-slate-600">
+    <tr className="bg-hover">
+      <td colSpan={14} className="px-3 py-1.5 text-xs font-semibold text-text-muted">
         {label}
       </td>
     </tr>
@@ -129,10 +130,10 @@ function SectionHeader({ label }: { label: string }) {
 
 function CategoryRow({ row }: { row: CategoryPnlRow }) {
   return (
-    <tr className="hover:bg-slate-50">
-      <td className="sticky left-0 bg-white px-3 py-1.5">{row.categoryName}</td>
+    <tr>
+      <td className="sticky left-0 bg-surface px-3 py-1.5">{row.categoryName}</td>
       {row.monthly.map((v, i) => (
-        <td key={i} className="px-3 py-1.5 text-right text-slate-600">
+        <td key={i} className="px-3 py-1.5 text-right text-text-muted">
           {v === 0 ? "—" : centsToDollarsString(v)}
         </td>
       ))}
@@ -153,7 +154,7 @@ function TotalRow({
   bold?: boolean;
 }) {
   return (
-    <tr className={bold ? "bg-slate-50 font-semibold" : "font-medium"}>
+    <tr className={bold ? "bg-hover font-semibold" : "font-medium"}>
       <td className="sticky left-0 bg-inherit px-3 py-1.5">{label}</td>
       {monthly.map((v, i) => (
         <td key={i} className="px-3 py-1.5 text-right">
