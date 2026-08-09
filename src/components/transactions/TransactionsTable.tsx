@@ -18,6 +18,12 @@ export default function TransactionsTable() {
   const [dateTo, setDateTo] = useState("");
   const [q, setQ] = useState("");
 
+  const [reprocessing, setReprocessing] = useState(false);
+  const [reprocessResult, setReprocessResult] = useState<{
+    scanned: number;
+    updated: number;
+  } | null>(null);
+
   const load = useCallback(async () => {
     try {
       const params = new URLSearchParams();
@@ -75,6 +81,23 @@ export default function TransactionsTable() {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
   }
 
+  async function reprocessCategories() {
+    setReprocessing(true);
+    setReprocessResult(null);
+    setError(null);
+    try {
+      const res = await fetch("/api/transactions/reprocess-categories", { method: "POST" });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setReprocessResult({ scanned: data.scanned, updated: data.updated });
+      await load();
+    } catch {
+      setError("Failed to reprocess categories.");
+    } finally {
+      setReprocessing(false);
+    }
+  }
+
   const total = useMemo(
     () => transactions.reduce((sum, t) => sum + t.amountCents, 0),
     [transactions],
@@ -84,13 +107,30 @@ export default function TransactionsTable() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-lg font-semibold">Transactions</h1>
-        <Link
-          href="/transactions/new"
-          className="rounded-md bg-slate-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-slate-700"
-        >
-          + New transaction
-        </Link>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={reprocessCategories}
+            disabled={reprocessing}
+            title="Re-apply Category Map rules to uncategorized and auto-matched transactions. Manually-set categories are never overwritten."
+            className="rounded-md border border-slate-300 px-4 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+          >
+            {reprocessing ? "Reprocessing..." : "Reprocess categories"}
+          </button>
+          <Link
+            href="/transactions/new"
+            className="rounded-md bg-slate-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-slate-700"
+          >
+            + New transaction
+          </Link>
+        </div>
       </div>
+
+      {reprocessResult && (
+        <p className="mb-4 text-sm text-emerald-700">
+          Scanned {reprocessResult.scanned} uncategorized/auto-matched transaction
+          {reprocessResult.scanned === 1 ? "" : "s"} &middot; updated {reprocessResult.updated}.
+        </p>
+      )}
 
       <div className="mb-4 flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4">
         <FilterField label="Account">

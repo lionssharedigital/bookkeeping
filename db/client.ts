@@ -39,7 +39,7 @@ function getDb(): BetterSQLite3Database<typeof schema> {
 export const db: BetterSQLite3Database<typeof schema> = new Proxy(
   {} as BetterSQLite3Database<typeof schema>,
   {
-    get(_target, prop, _receiver) {
+    get(_target, prop) {
       const real = getDb();
       const value = Reflect.get(real as object, prop, real);
       return typeof value === "function" ? value.bind(real) : value;
@@ -48,7 +48,7 @@ export const db: BetterSQLite3Database<typeof schema> = new Proxy(
 );
 
 export const sqlite: Database.Database = new Proxy({} as Database.Database, {
-  get(_target, prop, _receiver) {
+  get(_target, prop) {
     const real = getSqlite();
     const value = Reflect.get(real as object, prop, real);
     return typeof value === "function" ? value.bind(real) : value;
