@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { AccountRow, CategoryRow, TransactionRow } from "@/lib/types";
 import { centsToDollarsString, dollarsStringToCents } from "@/lib/money";
+import { SortableHeader, compareForSort, type SortDirection } from "@/components/ui/SortableHeader";
+
+type SortField = "date" | "payee" | "account" | "category" | "amount" | "description";
 
 export default function TransactionsTable() {
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
@@ -23,6 +26,18 @@ export default function TransactionsTable() {
     scanned: number;
     updated: number;
   } | null>(null);
+
+  const [sortField, setSortField] = useState<SortField>("date");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+  function handleSort(field: SortField) {
+    if (field === sortField) {
+      setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  }
 
   const load = useCallback(async () => {
     try {
@@ -102,6 +117,28 @@ export default function TransactionsTable() {
     () => transactions.reduce((sum, t) => sum + t.amountCents, 0),
     [transactions],
   );
+
+  const sortedTransactions = useMemo(() => {
+    const valueFor = (t: TransactionRow): string | number | null => {
+      switch (sortField) {
+        case "date":
+          return t.date;
+        case "payee":
+          return t.payee;
+        case "account":
+          return t.accountName;
+        case "category":
+          return t.categoryName;
+        case "amount":
+          return t.amountCents;
+        case "description":
+          return t.description;
+      }
+    };
+    return [...transactions].sort((a, b) =>
+      compareForSort(valueFor(a), valueFor(b), sortDirection),
+    );
+  }, [transactions, sortField, sortDirection]);
 
   return (
     <div>
@@ -197,17 +234,54 @@ export default function TransactionsTable() {
             <table className="w-full text-sm">
               <thead className="bg-slate-50 text-left text-xs font-medium uppercase text-slate-500">
                 <tr>
-                  <th className="px-4 py-2">Date</th>
-                  <th className="px-4 py-2">Payee</th>
-                  <th className="px-4 py-2">Account</th>
-                  <th className="px-4 py-2">Category</th>
-                  <th className="px-4 py-2 text-right">Amount</th>
-                  <th className="px-4 py-2">Description</th>
+                  <SortableHeader
+                    label="Date"
+                    field="date"
+                    currentField={sortField}
+                    currentDirection={sortDirection}
+                    onSort={handleSort}
+                  />
+                  <SortableHeader
+                    label="Payee"
+                    field="payee"
+                    currentField={sortField}
+                    currentDirection={sortDirection}
+                    onSort={handleSort}
+                  />
+                  <SortableHeader
+                    label="Account"
+                    field="account"
+                    currentField={sortField}
+                    currentDirection={sortDirection}
+                    onSort={handleSort}
+                  />
+                  <SortableHeader
+                    label="Category"
+                    field="category"
+                    currentField={sortField}
+                    currentDirection={sortDirection}
+                    onSort={handleSort}
+                  />
+                  <SortableHeader
+                    label="Amount"
+                    field="amount"
+                    currentField={sortField}
+                    currentDirection={sortDirection}
+                    onSort={handleSort}
+                    align="right"
+                  />
+                  <SortableHeader
+                    label="Description"
+                    field="description"
+                    currentField={sortField}
+                    currentDirection={sortDirection}
+                    onSort={handleSort}
+                  />
                   <th className="px-4 py-2"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {transactions.map((t) => (
+                {sortedTransactions.map((t) => (
                   <TransactionRowItem
                     key={t.id}
                     txn={t}

@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { AccountRow, AccountType } from "@/lib/types";
 import { centsToDollarsString, dollarsStringToCents } from "@/lib/money";
+import { SortableHeader, compareForSort, type SortDirection } from "@/components/ui/SortableHeader";
 
 const ACCOUNT_TYPES: AccountType[] = ["bank", "credit_card"];
+
+type SortField = "name" | "institution" | "type" | "openingBalance" | "openingDate";
 
 export default function AccountsTable() {
   const [accounts, setAccounts] = useState<AccountRow[]>([]);
@@ -87,7 +90,37 @@ export default function AccountsTable() {
     await load();
   }
 
-  const visibleAccounts = accounts.filter((a) => showArchived || !a.isArchived);
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+
+  function handleSort(field: SortField) {
+    if (field === sortField) {
+      setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  }
+
+  const visibleAccounts = useMemo(() => {
+    const filtered = accounts.filter((a) => showArchived || !a.isArchived);
+    if (!sortField) return filtered; // default: the accounts' own sortOrder (Profit First envelope order)
+    const valueFor = (a: AccountRow): string | number => {
+      switch (sortField) {
+        case "name":
+          return a.name;
+        case "institution":
+          return a.institution;
+        case "type":
+          return a.accountType;
+        case "openingBalance":
+          return a.openingBalanceCents;
+        case "openingDate":
+          return a.openingBalanceDate;
+      }
+    };
+    return [...filtered].sort((a, b) => compareForSort(valueFor(a), valueFor(b), sortDirection));
+  }, [accounts, showArchived, sortField, sortDirection]);
 
   return (
     <div>
@@ -177,11 +210,41 @@ export default function AccountsTable() {
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-xs font-medium uppercase text-slate-500">
               <tr>
-                <th className="px-4 py-2">Name</th>
-                <th className="px-4 py-2">Institution</th>
-                <th className="px-4 py-2">Type</th>
-                <th className="px-4 py-2">Opening balance</th>
-                <th className="px-4 py-2">As of</th>
+                <SortableHeader
+                  label="Name"
+                  field="name"
+                  currentField={sortField}
+                  currentDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Institution"
+                  field="institution"
+                  currentField={sortField}
+                  currentDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Type"
+                  field="type"
+                  currentField={sortField}
+                  currentDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Opening balance"
+                  field="openingBalance"
+                  currentField={sortField}
+                  currentDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="As of"
+                  field="openingDate"
+                  currentField={sortField}
+                  currentDirection={sortDirection}
+                  onSort={handleSort}
+                />
                 <th className="px-4 py-2"></th>
               </tr>
             </thead>

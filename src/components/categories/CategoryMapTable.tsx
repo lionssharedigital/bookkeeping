@@ -2,8 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { CategoryMapRuleRow, CategoryRow, CategoryType } from "@/lib/types";
+import { SortableHeader, compareForSort, type SortDirection } from "@/components/ui/SortableHeader";
 
 const TYPES: CategoryType[] = ["Income", "Expense", "Transfer", "Credit Card"];
+
+type SortField = "keyword" | "category" | "type" | "priority";
 
 export default function CategoryMapTable() {
   const [rules, setRules] = useState<CategoryMapRuleRow[]>([]);
@@ -16,6 +19,18 @@ export default function CategoryMapTable() {
   const [newCategory, setNewCategory] = useState("");
   const [newType, setNewType] = useState<CategoryType>("Expense");
   const [saving, setSaving] = useState(false);
+
+  const [sortField, setSortField] = useState<SortField>("priority");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+  function handleSort(field: SortField) {
+    if (field === sortField) {
+      setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  }
 
   async function load() {
     try {
@@ -46,11 +61,24 @@ export default function CategoryMapTable() {
 
   const filteredRules = useMemo(() => {
     const f = filter.toLowerCase();
-    return rules.filter(
+    const matches = rules.filter(
       (r) =>
         r.keyword.toLowerCase().includes(f) || r.categoryName.toLowerCase().includes(f),
     );
-  }, [rules, filter]);
+    const valueFor = (r: CategoryMapRuleRow): string | number => {
+      switch (sortField) {
+        case "keyword":
+          return r.keyword;
+        case "category":
+          return r.categoryName;
+        case "type":
+          return r.categoryType;
+        case "priority":
+          return r.priority;
+      }
+    };
+    return matches.sort((a, b) => compareForSort(valueFor(a), valueFor(b), sortDirection));
+  }, [rules, filter, sortField, sortDirection]);
 
   async function addRule(e: React.FormEvent) {
     e.preventDefault();
@@ -179,10 +207,34 @@ export default function CategoryMapTable() {
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-xs font-medium uppercase text-slate-500">
               <tr>
-                <th className="px-4 py-2">Keyword</th>
-                <th className="px-4 py-2">Category</th>
-                <th className="px-4 py-2">Type</th>
-                <th className="px-4 py-2">Priority</th>
+                <SortableHeader
+                  label="Keyword"
+                  field="keyword"
+                  currentField={sortField}
+                  currentDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Category"
+                  field="category"
+                  currentField={sortField}
+                  currentDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Type"
+                  field="type"
+                  currentField={sortField}
+                  currentDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Priority"
+                  field="priority"
+                  currentField={sortField}
+                  currentDirection={sortDirection}
+                  onSort={handleSort}
+                />
                 <th className="px-4 py-2">Active</th>
                 <th className="px-4 py-2"></th>
               </tr>
