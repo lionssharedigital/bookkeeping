@@ -12,7 +12,10 @@ export async function GET(req: NextRequest) {
   const dateFrom = sp.get("dateFrom");
   const dateTo = sp.get("dateTo");
   const q = sp.get("q");
-  const limit = Math.min(Number(sp.get("limit") ?? 200), 1000);
+  // No real pagination UI: for a single-business ledger, "show everything
+  // by default and let filters/sort narrow it down" is simpler than paging.
+  // The cap is just a sanity backstop, not an expected ceiling.
+  const limit = Math.min(Number(sp.get("limit") ?? 5000), 10000);
   const offset = Number(sp.get("offset") ?? 0);
 
   const conditions: SQL[] = [];

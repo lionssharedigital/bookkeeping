@@ -304,6 +304,11 @@ export default function TransactionsTable() {
           <p className="mt-3 text-sm text-slate-500">
             {transactions.length} transaction{transactions.length === 1 ? "" : "s"} &middot; net{" "}
             {centsToDollarsString(total)}
+            {transactions.length >= 10000 && (
+              <span className="ml-2 text-amber-600">
+                (showing the first 10,000 &mdash; narrow with filters above to see the rest)
+              </span>
+            )}
           </p>
         </>
       )}
