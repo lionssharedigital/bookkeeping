@@ -1,3 +1,5 @@
+import LionMark from "./LionMark";
+
 export default function Logo({
   collapsed = false,
   textColor = "var(--sidebar-text)",
@@ -7,26 +9,7 @@ export default function Logo({
 }) {
   return (
     <div className="flex items-center gap-2.5">
-      <svg
-        width="32"
-        height="32"
-        viewBox="0 0 32 32"
-        aria-hidden="true"
-        className="shrink-0"
-      >
-        <rect width="32" height="32" rx="9" fill="var(--accent)" />
-        <text
-          x="16"
-          y="21.5"
-          textAnchor="middle"
-          fontFamily="var(--font-display)"
-          fontWeight="700"
-          fontSize="14"
-          fill="#fff"
-        >
-          LS
-        </text>
-      </svg>
+      <LionMark size={32} />
       {!collapsed && (
         <span
           className="font-display text-[15px] leading-tight font-semibold tracking-tight"
