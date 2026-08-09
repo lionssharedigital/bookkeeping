@@ -6,5 +6,9 @@ export default async function ImportReviewPage({
   params: Promise<{ batchId: string }>;
 }) {
   const { batchId } = await params;
-  return <ImportReview batchId={Number(batchId)} />;
+  return (
+    <div className="mx-auto max-w-6xl">
+      <ImportReview batchId={Number(batchId)} />
+    </div>
+  );
 }
