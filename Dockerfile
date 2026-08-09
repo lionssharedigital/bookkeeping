@@ -4,6 +4,12 @@
 # version mismatch.
 FROM node:22-bookworm-slim AS deps
 WORKDIR /app
+# Node 22's bundled npm/node-gyp compiles better-sqlite3 from source during
+# npm ci (ignoring its bundled prebuilt binaries), unlike Node 20's older
+# npm which used the prebuild directly. python3/make/g++ are required for
+# that compile step to succeed.
+RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ \
+  && rm -rf /var/lib/apt/lists/*
 COPY package.json package-lock.json ./
 RUN npm ci
 
