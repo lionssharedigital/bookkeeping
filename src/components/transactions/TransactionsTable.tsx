@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { AccountRow, CategoryRow, TransactionRow } from "@/lib/types";
 import { centsToDollarsString, dollarsStringToCents } from "@/lib/money";
 import { SortableHeader, compareForSort, type SortDirection } from "@/components/ui/SortableHeader";
+import { usePersistedState } from "@/lib/usePersistedState";
 
 type SortField = "date" | "payee" | "account" | "category" | "amount" | "description";
 
@@ -15,11 +16,11 @@ export default function TransactionsTable() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [accountFilter, setAccountFilter] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
-  const [q, setQ] = useState("");
+  const [accountFilter, setAccountFilter] = usePersistedState("bk:transactions:accountFilter", "");
+  const [categoryFilter, setCategoryFilter] = usePersistedState("bk:transactions:categoryFilter", "");
+  const [dateFrom, setDateFrom] = usePersistedState("bk:transactions:dateFrom", "");
+  const [dateTo, setDateTo] = usePersistedState("bk:transactions:dateTo", "");
+  const [q, setQ] = usePersistedState("bk:transactions:q", "");
 
   const [reprocessing, setReprocessing] = useState(false);
   const [reprocessResult, setReprocessResult] = useState<{
@@ -27,8 +28,11 @@ export default function TransactionsTable() {
     updated: number;
   } | null>(null);
 
-  const [sortField, setSortField] = useState<SortField>("date");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [sortField, setSortField] = usePersistedState<SortField>("bk:transactions:sortField", "date");
+  const [sortDirection, setSortDirection] = usePersistedState<SortDirection>(
+    "bk:transactions:sortDirection",
+    "desc",
+  );
 
   function handleSort(field: SortField) {
     if (field === sortField) {

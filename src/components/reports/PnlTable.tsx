@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { centsToDollarsString } from "@/lib/money";
+import { usePersistedState } from "@/lib/usePersistedState";
+import PnlChart from "./PnlChart";
 
 const MONTH_LABELS = [
   "Jan",
@@ -38,7 +40,7 @@ interface ProfitLossReport {
 }
 
 export default function PnlTable() {
-  const [year, setYear] = useState(new Date().getFullYear());
+  const [year, setYear] = usePersistedState("bk:pnl:year", new Date().getFullYear());
   const [report, setReport] = useState<ProfitLossReport | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -73,7 +75,9 @@ export default function PnlTable() {
       {loading || !report ? (
         <p className="text-sm text-slate-500">Loading...</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+        <>
+          <PnlChart incomeMonthly={report.incomeMonthly} expenseMonthly={report.expenseMonthly} />
+          <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-xs font-medium uppercase text-slate-500">
               <tr>
@@ -106,7 +110,8 @@ export default function PnlTable() {
               <TotalRow label="NET PROFIT / LOSS" monthly={report.netMonthly} total={report.netTotal} bold />
             </tbody>
           </table>
-        </div>
+          </div>
+        </>
       )}
     </div>
   );

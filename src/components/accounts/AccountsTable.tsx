@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { AccountRow, AccountType } from "@/lib/types";
 import { centsToDollarsString, dollarsStringToCents } from "@/lib/money";
 import { SortableHeader, compareForSort, type SortDirection } from "@/components/ui/SortableHeader";
+import { usePersistedState } from "@/lib/usePersistedState";
 
 const ACCOUNT_TYPES: AccountType[] = ["bank", "credit_card"];
 
@@ -13,7 +14,7 @@ export default function AccountsTable() {
   const [accounts, setAccounts] = useState<AccountRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showArchived, setShowArchived] = useState(false);
+  const [showArchived, setShowArchived] = usePersistedState("bk:accounts:showArchived", false);
 
   const [name, setName] = useState("");
   const [institution, setInstitution] = useState("");
@@ -90,8 +91,11 @@ export default function AccountsTable() {
     await load();
   }
 
-  const [sortField, setSortField] = useState<SortField | null>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [sortField, setSortField] = usePersistedState<SortField | null>("bk:accounts:sortField", null);
+  const [sortDirection, setSortDirection] = usePersistedState<SortDirection>(
+    "bk:accounts:sortDirection",
+    "asc",
+  );
 
   function handleSort(field: SortField) {
     if (field === sortField) {

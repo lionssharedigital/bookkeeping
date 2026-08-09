@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { centsToDollarsString } from "@/lib/money";
+import { usePersistedState } from "@/lib/usePersistedState";
 
 interface AccountRow {
   accountId: number;
@@ -28,7 +29,10 @@ interface BalanceSheetReport {
 }
 
 export default function BalanceSheetTable() {
-  const [asOfDate, setAsOfDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [asOfDate, setAsOfDate] = usePersistedState(
+    "bk:balance-sheet:asOfDate",
+    new Date().toISOString().slice(0, 10),
+  );
   const [report, setReport] = useState<BalanceSheetReport | null>(null);
   const [loading, setLoading] = useState(true);
 

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CategoryMapRuleRow, CategoryRow, CategoryType } from "@/lib/types";
 import { SortableHeader, compareForSort, type SortDirection } from "@/components/ui/SortableHeader";
+import { usePersistedState } from "@/lib/usePersistedState";
 
 const TYPES: CategoryType[] = ["Income", "Expense", "Transfer", "Credit Card"];
 
@@ -13,15 +14,18 @@ export default function CategoryMapTable() {
   const [categories, setCategories] = useState<CategoryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = usePersistedState("bk:category-map:filter", "");
 
   const [newKeyword, setNewKeyword] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newType, setNewType] = useState<CategoryType>("Expense");
   const [saving, setSaving] = useState(false);
 
-  const [sortField, setSortField] = useState<SortField>("priority");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [sortField, setSortField] = usePersistedState<SortField>("bk:category-map:sortField", "priority");
+  const [sortDirection, setSortDirection] = usePersistedState<SortDirection>(
+    "bk:category-map:sortDirection",
+    "desc",
+  );
 
   function handleSort(field: SortField) {
     if (field === sortField) {
