@@ -1,4 +1,4 @@
-import LionMark from "./LionMark";
+import Image from "next/image";
 
 export default function Logo({
   collapsed = false,
@@ -9,7 +9,15 @@ export default function Logo({
 }) {
   return (
     <div className="flex items-center gap-2.5">
-      <LionMark size={32} />
+      <Image
+        src="/lions-share-logo-192x172.png"
+        alt="Lion's Share Digital"
+        width={192}
+        height={172}
+        style={{ width: 32, height: "auto" }}
+        className="shrink-0"
+        priority
+      />
       {!collapsed && (
         <span
           className="font-display text-[15px] leading-tight font-semibold tracking-tight"
