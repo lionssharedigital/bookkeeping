@@ -7,6 +7,8 @@ import { centsToDollarsString, dollarsStringToCents } from "@/lib/money";
 import { SortableHeader, compareForSort, type SortDirection } from "@/components/ui/SortableHeader";
 import { TableSkeleton } from "@/components/ui/Skeleton";
 import EmptyState from "@/components/ui/EmptyState";
+import ExportMenu from "@/components/ui/ExportMenu";
+import type { ExportFormat } from "@/lib/export";
 import { usePersistedState } from "@/lib/usePersistedState";
 
 type SortField = "date" | "payee" | "account" | "category" | "amount" | "description";
@@ -119,6 +121,17 @@ export default function TransactionsTable() {
     }
   }
 
+  function buildExportHref(format: ExportFormat) {
+    const params = new URLSearchParams();
+    if (accountFilter) params.set("accountId", accountFilter);
+    if (categoryFilter) params.set("categoryId", categoryFilter);
+    if (dateFrom) params.set("dateFrom", dateFrom);
+    if (dateTo) params.set("dateTo", dateTo);
+    if (q) params.set("q", q);
+    params.set("format", format);
+    return `/api/transactions/export?${params.toString()}`;
+  }
+
   const total = useMemo(
     () => transactions.reduce((sum, t) => sum + t.amountCents, 0),
     [transactions],
@@ -159,6 +172,7 @@ export default function TransactionsTable() {
           >
             {reprocessing ? "Reprocessing..." : "Reprocess categories"}
           </button>
+          <ExportMenu buildHref={buildExportHref} />
           <Link href="/transactions/new" className="btn-primary px-4 py-1.5 text-sm font-medium">
             + New transaction
           </Link>

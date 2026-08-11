@@ -1,29 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { and, desc, eq, gte, like, lte, SQL } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "../../../../db/client";
 import { transactions, accounts, categories } from "../../../../db/schema";
 import { computeDedupHash } from "@/lib/dedup";
+import { transactionFilterConditions } from "@/lib/transactions-query";
 
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
-  const accountId = sp.get("accountId");
-  const categoryId = sp.get("categoryId");
-  const dateFrom = sp.get("dateFrom");
-  const dateTo = sp.get("dateTo");
-  const q = sp.get("q");
   // No real pagination UI: for a single-business ledger, "show everything
   // by default and let filters/sort narrow it down" is simpler than paging.
   // The cap is just a sanity backstop, not an expected ceiling.
   const limit = Math.min(Number(sp.get("limit") ?? 5000), 10000);
   const offset = Number(sp.get("offset") ?? 0);
 
-  const conditions: SQL[] = [];
-  if (accountId) conditions.push(eq(transactions.accountId, Number(accountId)));
-  if (categoryId) conditions.push(eq(transactions.categoryId, Number(categoryId)));
-  if (dateFrom) conditions.push(gte(transactions.date, dateFrom));
-  if (dateTo) conditions.push(lte(transactions.date, dateTo));
-  if (q) conditions.push(like(transactions.payee, `%${q}%`));
+  const conditions = transactionFilterConditions(sp);
 
   const rows = db
     .select({

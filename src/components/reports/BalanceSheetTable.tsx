@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { centsToDollarsString } from "@/lib/money";
 import { usePersistedState } from "@/lib/usePersistedState";
 import { TableSkeleton } from "@/components/ui/Skeleton";
+import ExportMenu from "@/components/ui/ExportMenu";
+import type { ExportFormat } from "@/lib/export";
 
 interface AccountRow {
   accountId: number;
@@ -48,13 +50,18 @@ export default function BalanceSheetTable() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-display text-lg font-semibold">Balance Sheet</h1>
-        <div className="flex items-center gap-2 text-sm">
-          <label className="text-text-muted">As of</label>
-          <input
-            type="date"
-            value={asOfDate}
-            onChange={(e) => setAsOfDate(e.target.value)}
-            className="control-input px-2 py-1.5"
+        <div className="flex items-center gap-3 text-sm">
+          <div className="flex items-center gap-2">
+            <label className="text-text-muted">As of</label>
+            <input
+              type="date"
+              value={asOfDate}
+              onChange={(e) => setAsOfDate(e.target.value)}
+              className="control-input px-2 py-1.5"
+            />
+          </div>
+          <ExportMenu
+            buildHref={(format: ExportFormat) => `/api/reports/balance-sheet/export?asOfDate=${asOfDate}&format=${format}`}
           />
         </div>
       </div>

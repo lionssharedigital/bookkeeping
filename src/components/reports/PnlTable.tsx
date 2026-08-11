@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { centsToDollarsString } from "@/lib/money";
 import { usePersistedState } from "@/lib/usePersistedState";
 import { TableSkeleton } from "@/components/ui/Skeleton";
+import ExportMenu from "@/components/ui/ExportMenu";
+import type { ExportFormat } from "@/lib/export";
 import PnlChart from "./PnlChart";
 
 const MONTH_LABELS = [
@@ -56,20 +58,25 @@ export default function PnlTable() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-display text-lg font-semibold">Profit &amp; Loss</h1>
-        <div className="flex items-center gap-2 text-sm">
-          <button
-            onClick={() => setYear((y) => y - 1)}
-            className="btn-secondary h-8 w-8 rounded-full text-center"
-          >
-            &larr;
-          </button>
-          <span className="w-12 text-center font-medium">{year}</span>
-          <button
-            onClick={() => setYear((y) => y + 1)}
-            className="btn-secondary h-8 w-8 rounded-full text-center"
-          >
-            &rarr;
-          </button>
+        <div className="flex items-center gap-3 text-sm">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setYear((y) => y - 1)}
+              className="btn-secondary h-8 w-8 rounded-full text-center"
+            >
+              &larr;
+            </button>
+            <span className="w-12 text-center font-medium">{year}</span>
+            <button
+              onClick={() => setYear((y) => y + 1)}
+              className="btn-secondary h-8 w-8 rounded-full text-center"
+            >
+              &rarr;
+            </button>
+          </div>
+          <ExportMenu
+            buildHref={(format: ExportFormat) => `/api/reports/profit-loss/export?year=${year}&format=${format}`}
+          />
         </div>
       </div>
 
